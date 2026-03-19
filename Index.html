@@ -1,0 +1,151 @@
+```html id="allinonefirebase"
+<!DOCTYPE html>
+<html>
+<head>
+<title>MyTube Firebase 🚀</title>
+
+<style>
+body{
+margin:0;
+font-family:Arial;
+background:#0f2027;
+color:white;
+text-align:center;
+}
+
+button{
+padding:10px;
+margin:5px;
+border:none;
+background:#ff4757;
+color:white;
+border-radius:5px;
+cursor:pointer;
+}
+
+input{
+padding:8px;
+margin:5px;
+border-radius:5px;
+border:none;
+}
+
+video{
+margin:10px;
+border-radius:10px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🔥 MyTube Firebase</h1>
+
+<!-- LOGIN -->
+<div>
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+<br>
+<button onclick="signup()">Signup</button>
+<button onclick="login()">Login</button>
+</div>
+
+<hr>
+
+<!-- UPLOAD -->
+<input type="file" id="file">
+<button onclick="upload()">Upload Video</button>
+
+<br><br>
+
+<button onclick="loadVideos()">Show Videos</button>
+
+<div id="videos"></div>
+
+<!-- FIREBASE SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+<script>
+
+// 🔥 PASTE YOUR CONFIG HERE
+const firebaseConfig = {
+  apiKey: "PASTE_YOUR_CONFIG_HERE",
+  authDomain: "PASTE",
+  projectId: "PASTE",
+  storageBucket: "PASTE",
+  appId: "PASTE"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+// SIGNUP
+function signup(){
+let email=document.getElementById("email").value;
+let pass=document.getElementById("password").value;
+
+auth.createUserWithEmailAndPassword(email,pass)
+.then(()=>alert("Signup success 🔥"))
+.catch(e=>alert(e.message));
+}
+
+// LOGIN
+function login(){
+let email=document.getElementById("email").value;
+let pass=document.getElementById("password").value;
+
+auth.signInWithEmailAndPassword(email,pass)
+.then(()=>alert("Login success ✅"))
+.catch(e=>alert(e.message));
+}
+
+// UPLOAD VIDEO
+function upload(){
+let file=document.getElementById("file").files[0];
+if(!file){ alert("Select file bro"); return; }
+
+let ref=storage.ref("videos/"+file.name);
+
+ref.put(file).then(()=>{
+ref.getDownloadURL().then(url=>{
+
+db.collection("videos").add({
+url:url,
+name:file.name
+});
+
+alert("Uploaded 🚀");
+
+});
+});
+}
+
+// LOAD VIDEOS
+function loadVideos(){
+let box=document.getElementById("videos");
+box.innerHTML="";
+
+db.collection("videos").get().then(snapshot=>{
+snapshot.forEach(doc=>{
+let v=doc.data();
+
+box.innerHTML+=`
+<video width="300" controls>
+<source src="${v.url}" type="video/mp4">
+</video>
+`;
+});
+});
+}
+
+</script>
+
+</body>
+</html>
+```
